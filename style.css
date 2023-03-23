@@ -51,3 +51,16 @@ footer a:hover{
 .active{
   border-bottom: solid 3px red;
 }
+/* .all{
+  width: 80%;
+  margin: 10px auto;
+  background-image: url(1.jpg);
+  background-repeat: no-repeat;
+  background-position-x: center;
+  background-position-y: center;
+  background-blend-mode: darken;
+} */
+.all{
+  width: 75%;
+  margin: 10px auto;
+}
