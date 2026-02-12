@@ -1,34 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>أذكار المسلم</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
   <script defer src="main.js"></script>
-  <title>اذكر الله</title>
 </head>
 
 <body>
-  <div class="all">
+  <div class="app-container">
     <header>
-      <section dir="rtl">
-        <h1 id="morning">اذكار الصباح</h1>
-        <h1 id="evening">اذكار المساء</h1>
-      </section>
+      <h1>أذكار المسلم</h1>
+      <p id="date-display"></p>
     </header>
-    <main>
-      <section id="morning-sec" dir="rtl"></section>
-      <section style="display: none" id="evening-sec" dir="rtl"></section>
+
+    <main id="main-content">
+      <!-- Views will be injected here -->
     </main>
-    <footer>
-      <h6>
-        Created by
-        <a href="http://wa.me/97466945713" target="_blank" rel="noopener noreferrer">Khaled</a>
-      </h6>
-    </footer>
+
+    <nav id="bottom-nav">
+      <button id="nav-home" class="active">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        الرئيسية
+      </button>
+      <button id="nav-settings">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+          </path>
+        </svg>
+        الإعدادات
+      </button>
+    </nav>
   </div>
+
+  <!-- Templates -->
+  <template id="category-card-template">
+    <div class="category-card">
+      <h3 class="category-title"></h3>
+      <div class="category-meta">
+        <span class="category-count"></span>
+        <span class="category-progress">0%</span>
+      </div>
+    </div>
+  </template>
+
+  <template id="zkr-card-template">
+    <div class="zkr-card">
+      <p class="zkr-text"></p>
+      <p class="zkr-description"></p>
+      <div class="zkr-footer">
+        <span class="zkr-current-count">0</span>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+        <span class="zkr-target-count"></span>
+      </div>
+      <button class="zkr-action-area"></button>
+    </div>
+  </template>
+
 </body>
 
 </html>
