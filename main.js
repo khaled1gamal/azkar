@@ -131,6 +131,14 @@ function renderCategory(categoryId) {
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                 العودة للقائمة
             </button>
+            ${categoryId === 'post_prayer' ? `
+            <button class="reset-category-btn" onclick="resetCategoryProgress('${categoryId}')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                </svg>
+                ضبط للصلاة التالية
+            </button>
+            ` : ''}
         </div>
         <h2 style="margin-bottom: 20px; color: var(--primary-color)">${catData.title}</h2>
         <div id="azkar-list"></div>
@@ -332,6 +340,19 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('nav-settings').addEventListener('click', renderSettings);
 });
 
+function resetCategoryProgress(categoryId) {
+  if (confirm('هل تريد إعادة ضبط عدادات هذا القسم فقط للصلاة التالية؟')) {
+    const catData = APP_STATE.data[categoryId];
+    catData.items.forEach((item, index) => {
+      const itemId = `${categoryId}-${index}`;
+      delete APP_STATE.progress[itemId];
+    });
+    saveProgress();
+    renderCategory(categoryId);
+  }
+}
+
 // Expose functions to window for onclick handlers
 window.renderHome = renderHome;
 window.resetAllProgress = resetAllProgress;
+window.resetCategoryProgress = resetCategoryProgress;

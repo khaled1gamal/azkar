@@ -106,6 +106,9 @@ main {
 /* Azkar List */
 .header-actions {
     margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .back-btn {
@@ -118,6 +121,31 @@ main {
     display: flex;
     align-items: center;
     gap: 5px;
+}
+
+.reset-category-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.2s, transform 0.1s;
+    box-shadow: var(--shadow-sm);
+}
+
+.reset-category-btn:hover {
+    background-color: #0b3d26;
+}
+
+.reset-category-btn:active {
+    transform: scale(0.97);
 }
 
 .zkr-card {
