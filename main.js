@@ -2,6 +2,7 @@ const APP_STATE = {
   currentView: 'home',
   data: null,
   progress: {},
+  customGoals: {},
   lastReset: null
 };
 
@@ -12,11 +13,13 @@ function loadProgress() {
   if (saved) {
     const parsed = JSON.parse(saved);
     APP_STATE.progress = parsed.progress || {};
+    APP_STATE.customGoals = parsed.customGoals || {};
     APP_STATE.lastReset = parsed.lastReset;
 
     checkReset();
   } else {
     APP_STATE.progress = {};
+    APP_STATE.customGoals = {};
     APP_STATE.lastReset = Date.now();
     saveProgress();
   }
@@ -25,6 +28,7 @@ function loadProgress() {
 function saveProgress() {
   localStorage.setItem('azkar_progress', JSON.stringify({
     progress: APP_STATE.progress,
+    customGoals: APP_STATE.customGoals,
     lastReset: APP_STATE.lastReset
   }));
 }
@@ -93,14 +97,18 @@ function renderHome() {
 
     // Calculate progress
     const totalItems = cat.items.length;
-    let completedItems = 0;
+    let totalProgressPercent = 0;
     cat.items.forEach((item, index) => {
       const itemId = `${cat.id}-${index}`;
-      const current = APP_STATE.progress[itemId] !== undefined ? APP_STATE.progress[itemId] : item.count;
-      if (current === 0) completedItems++;
+      const targetCount = (cat.id === 'tasabeeh' && APP_STATE.customGoals && APP_STATE.customGoals[itemId] !== undefined)
+        ? parseInt(APP_STATE.customGoals[itemId], 10)
+        : parseInt(item.count, 10);
+      const current = APP_STATE.progress[itemId] !== undefined ? APP_STATE.progress[itemId] : targetCount;
+      const itemProgress = targetCount > 0 ? ((targetCount - current) / targetCount) : 0;
+      totalProgressPercent += itemProgress;
     });
 
-    const percent = Math.round((completedItems / totalItems) * 100);
+    const percent = totalItems > 0 ? Math.round((totalProgressPercent / totalItems) * 100) : 0;
     card.querySelector('.category-count').textContent = `${totalItems} ذكر`;
     card.querySelector('.category-progress').textContent = `${percent}%`;
 
@@ -133,17 +141,12 @@ function renderCategory(categoryId) {
 
   catData.items.forEach((item, index) => {
     const itemId = `${categoryId}-${index}`; // Unique ID for storage
-    // Initialize count if not present
-    if (APP_STATE.progress[itemId] === undefined) {
-      // item.count might be string in JSON, parse it
-      // Actually my merge script parsed it to int. valid.
-    }
 
     const clone = template.content.cloneNode(true);
     const card = clone.querySelector('.zkr-card');
     const countDisplay = clone.querySelector('.zkr-current-count');
     const progressBar = clone.querySelector('.progress-fill');
-    const actionBtn = clone.querySelector('.zkr-action-area'); // The invisible button
+    const targetCountDisplay = clone.querySelector('.zkr-target-count');
 
     // Populate text
     clone.querySelector('.zkr-text').textContent = item.text;
@@ -153,14 +156,15 @@ function renderCategory(categoryId) {
       clone.querySelector('.zkr-description').style.display = 'none';
     }
 
-    clone.querySelector('.zkr-target-count').textContent = `الهدف: ${item.count}`;
-
     // Render State
     const renderState = () => {
-      const current = APP_STATE.progress[itemId] !== undefined ? APP_STATE.progress[itemId] : item.count;
+      const targetCount = (categoryId === 'tasabeeh' && APP_STATE.customGoals && APP_STATE.customGoals[itemId] !== undefined)
+        ? parseInt(APP_STATE.customGoals[itemId], 10)
+        : parseInt(item.count, 10);
+      const current = APP_STATE.progress[itemId] !== undefined ? APP_STATE.progress[itemId] : targetCount;
       countDisplay.textContent = current;
 
-      const progress = ((item.count - current) / item.count) * 100;
+      const progress = targetCount > 0 ? ((targetCount - current) / targetCount) * 100 : 0;
       progressBar.style.width = `${progress}%`;
 
       if (current === 0) {
@@ -168,15 +172,98 @@ function renderCategory(categoryId) {
         progressBar.style.backgroundColor = '#198754';
       } else {
         card.classList.remove('completed');
+        progressBar.style.backgroundColor = 'var(--accent-color)';
       }
+
+      targetCountDisplay.textContent = `الهدف: ${targetCount}`;
     };
+
+    // Goal Editor Logic (Only for Tasbih category)
+    if (categoryId === 'tasabeeh') {
+      const editBtn = clone.querySelector('.edit-goal-btn');
+      const goalEditor = clone.querySelector('.goal-editor');
+      const customInput = clone.querySelector('.custom-goal-input');
+      const saveBtn = clone.querySelector('.save-goal-action-btn');
+      const cancelBtn = clone.querySelector('.cancel-goal-action-btn');
+
+      // Show edit button
+      editBtn.style.display = 'inline-flex';
+
+      // Click edit button: toggle editor
+      editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        // Close other goal editors to keep UI clean
+        const allEditors = document.querySelectorAll('.goal-editor');
+        allEditors.forEach(editor => {
+          if (editor !== goalEditor) {
+            editor.style.display = 'none';
+          }
+        });
+
+        const isHidden = goalEditor.style.display === 'none';
+        goalEditor.style.display = isHidden ? 'block' : 'none';
+
+        if (isHidden) {
+          const targetCount = APP_STATE.customGoals[itemId] !== undefined
+            ? APP_STATE.customGoals[itemId]
+            : item.count;
+          customInput.value = targetCount;
+          customInput.focus();
+        }
+      });
+
+      // Prevent clicks on editor from decrementing count
+      goalEditor.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      // Update goal helper function
+      const updateGoal = (newGoal) => {
+        if (isNaN(newGoal) || newGoal <= 0) {
+          alert('الرجاء إدخال هدف صحيح أكبر من الصفر');
+          return;
+        }
+        APP_STATE.customGoals[itemId] = newGoal;
+        // Reset progress to the new target goal
+        APP_STATE.progress[itemId] = newGoal;
+        saveProgress();
+        renderState();
+        goalEditor.style.display = 'none';
+      };
+
+      // Preset buttons clicks
+      clone.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const val = parseInt(btn.getAttribute('data-value'), 10);
+          updateGoal(val);
+        });
+      });
+
+      // Save custom goal click
+      saveBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const val = parseInt(customInput.value, 10);
+        updateGoal(val);
+      });
+
+      // Cancel click
+      cancelBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        goalEditor.style.display = 'none';
+      });
+    }
 
     // Initial render
     renderState();
 
     // Interaction
     card.addEventListener('click', () => {
-      let current = APP_STATE.progress[itemId] !== undefined ? APP_STATE.progress[itemId] : item.count;
+      const targetCount = (categoryId === 'tasabeeh' && APP_STATE.customGoals && APP_STATE.customGoals[itemId] !== undefined)
+        ? parseInt(APP_STATE.customGoals[itemId], 10)
+        : parseInt(item.count, 10);
+      let current = APP_STATE.progress[itemId] !== undefined ? APP_STATE.progress[itemId] : targetCount;
 
       if (current > 0) {
         current--;

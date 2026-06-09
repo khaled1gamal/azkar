@@ -67,8 +67,37 @@
         <div class="progress-bar">
           <div class="progress-fill"></div>
         </div>
-        <span class="zkr-target-count"></span>
+        <div class="zkr-target-wrapper">
+          <span class="zkr-target-count"></span>
+          <button class="edit-goal-btn" style="display: none;" title="تعديل الهدف">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+          </button>
+        </div>
       </div>
+
+      <!-- Inline Goal Editor Panel -->
+      <div class="goal-editor" style="display: none;">
+        <div class="goal-editor-header">
+          <span>تعديل الهدف:</span>
+        </div>
+        <div class="goal-editor-body">
+          <div class="preset-buttons">
+            <button class="preset-btn" data-value="33">33</button>
+            <button class="preset-btn" data-value="100">100</button>
+            <button class="preset-btn" data-value="1000">1000</button>
+          </div>
+          <div class="custom-input-group">
+            <input type="number" class="custom-goal-input" min="1" max="99999" placeholder="هدف مخصص" />
+            <button class="save-goal-action-btn">حفظ</button>
+            <button class="cancel-goal-action-btn">إلغاء</button>
+          </div>
+        </div>
+      </div>
+
       <button class="zkr-action-area"></button>
     </div>
   </template>
